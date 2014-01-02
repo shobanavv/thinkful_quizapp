@@ -38,7 +38,7 @@
    var score = 0;
    var submitCount = 0;
    var userArray = [-1,-1,-1,-1,-1];
-   var submitAnswer, goToNext;
+   var submitAnswer, goToNext, disableButton;
  
 
 
@@ -51,12 +51,18 @@
         for (var i=0;i<4;i++) {
                 $("#option-div").append('<label><input type= "radio" name = "choice" value = "' + i + '"/>'+ [i+1] + '.  ' + questionArray[num].options[i]+ "</label><br>");
         }; 
+        if(num == 0) {
+            disableButton($("#pre-button"));
+        } else {
+         enableButton();
+        }
         if(userArray[num] != -1){
             $('input[value = "' + userArray[num] + '"]').attr('checked', 'checked');
+            disableButton($('#submit-id'));
         }
         //if("#nav .question-navi").val() == num) {
             
-        }
+        //}
     };
 
     submitAnswer = function() {
@@ -73,8 +79,8 @@
                 userArray[num] = $('input[name = "choice"]:checked').val();
                 submitCount = submitCount +1;
             } else {
-            $("#message").text("Select an option.");
-            submitCount = 0;
+                $("#message").text("Select an option.");
+                submitCount = 0;
             }
         } else {
             $("#message").text("Click 'Next' to go to next question.");
@@ -92,12 +98,20 @@
                 $("#twin-div-id").empty();
                 $("#twin-div-id").append("<br><br>Your score is " + score + " / 5.");
                 $("#twin-div-id").append('<br><br><input type = "button"  id = "try-again" value = "Try Again">');
-                $("#next-button").prop('disabled', 'true');
-
+                disableButton($("#next-button"));
             }
         } else {
             $("#message").text("Select an option and Submit.");
         }
+    };
+
+    disableButton = function(buttonElem) {
+            buttonElem.prop('disabled', 'true');
+            buttonElem.addClass('disable-button');
+    };
+    enableButton = function() {
+            $("button").removeAttr('disabled');
+            $("button").removeClass('disable-button');
     };
 
     $("#submit-id").click (function(){ 
@@ -105,25 +119,27 @@
     }); 
 
     $("#next-button").click(function() {
+        submitAnswer();
         goToNext();
     });
 
-    $("#pre-button").click(function() {
-        $("#message").empty();
-        $("#question-display-id").empty();
-        $("#option-div").empty();
+    $("#pre-button").click(function() {    
         if(num > 0) {
+            $("#message").empty();
+            $("#question-display-id").empty();
+            $("#option-div").empty();
             num = num - 1;
             createQuestion(num);
         } else { 
-            $("#pre-button").prop('disabled', 'true');
-            location.reload();
+            disableButton($("#pre-button"));
+//          location.reload();
         }
     });
 
     $("#twin-div-id").on('click', '#try-again', function() {
-      location.reload(true);
+        location.reload(true);
     });
+    
     $("#option-div").dblclick(function() {
         submitAnswer();
         goToNext();
